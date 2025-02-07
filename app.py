@@ -1,7 +1,7 @@
 import random
 from sqlalchemy.orm import sessionmaker
-
 from models import User, engine
+from sqlalchemy import and_, not_, or_
 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -25,3 +25,24 @@ print("Filtered Users: ", len(user_filtered))
 users = session.query(User).filter_by(age=35).all()
 for user in users:
     print(f"User name: {user.name}, age: {user.age}, id: {user.id}")
+
+
+# user where for query
+users = session.query(User).where((User.name=="Iron Man") & (User.age==35) & (User.id>4)).all()
+for user in users:
+    print(f"{user.age} - {user.name}")
+
+users = (
+    session.query(User).where(
+        or_(
+            not_(User.name=="Iron Man"),
+            and_(
+                User.age > 35,
+                User.age < 60
+            )
+        )
+    )
+).all()
+
+for user in users:
+    print(f"{user.age} - {user.name}")
