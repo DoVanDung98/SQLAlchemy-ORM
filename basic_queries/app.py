@@ -1,7 +1,7 @@
 import random
 from sqlalchemy.orm import sessionmaker
 from models import User, engine
-from sqlalchemy import and_, not_, or_
+from sqlalchemy import and_, not_, or_, func
 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -46,3 +46,20 @@ users = (
 
 for user in users:
     print(f"{user.age} - {user.name}")
+
+
+# group users by age
+users = session.query(User.age, func.count(User.id)).group_by(User.age).all()
+print(users)
+
+user_tuple = (
+    session.query(User.age, func.count(User.id))
+    .filter(User.age>24)
+    .order_by(User.age)
+    .filter(User.age<50)
+    .group_by(User.age)
+    .all()
+)
+
+for age, count in user_tuple:
+    print(f"Age: {age} - {count} users")
